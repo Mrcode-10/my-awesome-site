@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Core Studio — Mani Ebrahimi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --purple: #6A1B9A; --purple-light: #C77DFF;
+    --bg-dark: #0B0B0E; --bg-card: #111118; --bg-card2: #0E0E15;
+    --text-main: #EDEDED; --text-muted: #888; --accent: #C77DFF;
+  }
+  body { background: var(--bg-dark); color: var(--text-main); font-family: 'Share Tech Mono', monospace; overflow-x: hidden; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(106,27,154,0.03) 2px, rgba(106,27,154,0.03) 4px); pointer-events: none; z-index: 100; }
+  .page-wrapper { max-width: 680px; margin: 0 auto; }
+  .hero { position: relative; min-height: 340px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px 32px; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(106,27,154,0.22) 0%, transparent 70%); }
+  .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(106,27,154,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(106,27,154,0.12) 1px, transparent 1px); background-size: 40px 40px; -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); }
+  .logo-area { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 16px; animation: fadeUp 0.8s ease forwards; }
+  .logo-svg-wrap { filter: drop-shadow(0 0 18px rgba(199,125,255,0.5)); animation: pulseGlow 3s ease-in-out infinite; }
+  @keyframes pulseGlow { 0%,100%{filter:drop-shadow(0 0 12px rgba(199,125,255,0.4))} 50%{filter:drop-shadow(0 0 28px rgba(199,125,255,0.8))} }
+  .studio-title { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 900; letter-spacing: 6px; color: var(--text-main); text-align: center; text-shadow: 0 0 30px rgba(199,125,255,0.5); }
+  .studio-title span { color: var(--purple-light); }
+  .tagline { font-size: 11px; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; text-align: center; }
+  .blink-cursor { animation: blink 1.1s steps(1) infinite; color: var(--accent); }
+  @keyframes blink { 50%{opacity:0} }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--purple), transparent); margin: 0 24px; position: relative; }
+  .divider::before { content: '◆'; position: absolute; left: 50%; transform: translate(-50%,-50%); color: var(--purple-light); font-size: 10px; background: var(--bg-dark); padding: 0 8px; }
+  .section { padding: 28px 24px; }
+  .section-label { font-size: 10px; letter-spacing: 4px; color: var(--purple-light); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(106,27,154,0.5), transparent); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .info-card { background: var(--bg-card); border: 1px solid rgba(106,27,154,0.3); border-radius: 6px; padding: 12px 14px; position: relative; overflow: hidden; }
+  .info-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--purple), var(--purple-light)); }
+  .info-card .ic-label { font-size: 9px; letter-spacing: 3px; color: var(--text-muted); margin-bottom: 6px; }
+  .info-card .ic-value { font-size: 13px; color: var(--text-main); }
+  .info-card .ic-value.accent { color: var(--purple-light); }
+  .about-bio { background: var(--bg-card2); border: 1px solid rgba(106,27,154,0.2); border-left: 3px solid var(--purple); border-radius: 0 6px 6px 0; padding: 14px 16px; font-size: 12px; line-height: 1.8; color: #bbb; }
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .skill-badge { background: var(--bg-card); border: 1px solid rgba(106,27,154,0.35); border-radius: 4px; padding: 10px 8px; text-align: center; font-size: 11px; color: var(--accent); letter-spacing: 1px; transition: all 0.2s; cursor: default; }
+  .skill-badge:hover { border-color: var(--purple-light); background: rgba(106,27,154,0.15); color: #fff; }
+  .skill-badge .sb-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+  .loves-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .love-tag { background: rgba(106,27,154,0.15); border: 1px solid rgba(106,27,154,0.4); border-radius: 20px; padding: 5px 14px; font-size: 11px; color: var(--purple-light); letter-spacing: 1px; }
+  .contact-box { background: var(--bg-card); border: 1px solid rgba(106,27,154,0.3); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .contact-row { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+  .contact-row .cr-icon { width: 32px; height: 32px; border: 1px solid rgba(199,125,255,0.4); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background: rgba(106,27,154,0.1); }
+  .contact-row .cr-label { color: var(--text-muted); font-size: 9px; letter-spacing: 2px; }
+  .contact-row .cr-value { color: var(--text-main); }
+  .contact-row .cr-value a { color: var(--purple-light); text-decoration: none; }
+  .contact-row .cr-value a:hover { text-decoration: underline; }
+  .yt-row { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+  .yt-icon { width: 32px; height: 32px; border: 1px solid rgba(255,80,80,0.5); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background: rgba(255,0,0,0.08); }
+  .yt-label { color: var(--text-muted); font-size: 9px; letter-spacing: 2px; }
+  .yt-value a { color: #FF6B6B; text-decoration: none; transition: color 0.2s; }
+  .yt-value a:hover { color: #FF4444; text-decoration: underline; }
+  .footer { text-align: center; padding: 24px; font-size: 10px; color: rgba(136,136,136,0.5); letter-spacing: 3px; border-top: 1px solid rgba(106,27,154,0.15); }
+  .terminal-line { font-size: 11px; color: rgba(199,125,255,0.5); padding: 6px 24px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="logo-area">
+      <div class="logo-svg-wrap">
+        <svg width="90" height="90" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="110" cy="110" r="80" fill="none" stroke="#6A1B9A" stroke-width="5"/>
+          <circle cx="110" cy="110" r="60" fill="none" stroke="rgba(106,27,154,0.3)" stroke-width="1" stroke-dasharray="4 6"/>
+          <path d="M110 30 L93 78" stroke="#6A1B9A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M190 110 L145 128" stroke="#6A1B9A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M110 190 L127 148" stroke="#6A1B9A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M30 110 L75 103" stroke="#6A1B9A" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="110" cy="110" r="14" fill="none" stroke="#C77DFF" stroke-width="2"/>
+          <circle cx="110" cy="110" r="6" fill="#C77DFF"/>
+        </svg>
+      </div>
+      <div class="studio-title"><span>SHADOW</span> CORE <span>STUDIO</span></div>
+      <div class="tagline">Independent Game Development · Est. 2024 <span class="blink-cursor">_</span></div>
+    </div>
+  </div>
+
+  <div class="terminal-line">> initializing developer profile... <span style="color:#C77DFF">OK</span></div>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-label">// ABOUT</div>
+    <div class="about-grid">
+      <div class="info-card"><div class="ic-label">DEVELOPER</div><div class="ic-value accent">Mani Ebrahimi</div></div>
+      <div class="info-card"><div class="ic-label">ALIAS</div><div class="ic-value accent">Shadow Game Dev</div></div>
+      <div class="info-card"><div class="ic-label">AGE</div><div class="ic-value">20 Years Old</div></div>
+      <div class="info-card"><div class="ic-label">STATUS</div><div class="ic-value" style="color:#4CAF50">● Active Developer</div></div>
+    </div>
+    <div class="about-bio">
+      A 20-year-old creator building worlds from the dark. Passionate about games that leave you speechless — games where you finish and just say: <span style="color:#C77DFF">"Wow."</span>
+      High-end graphics, deep concepts, and unforgettable experiences — that's what Shadow Core Studio is all about.
+      Currently a student and solo developer, crafting worlds with Unreal Engine.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-label">// TECH STACK</div>
+    <div class="skills-grid">
+      <div class="skill-badge"><span class="sb-icon">⚡</span>Unreal Engine</div>
+      <div class="skill-badge"><span class="sb-icon">🎮</span>Game Design</div>
+      <div class="skill-badge"><span class="sb-icon">🌑</span>Dark Worlds</div>
+      <div class="skill-badge"><span class="sb-icon">🎨</span>High-End Graphics</div>
+      <div class="skill-badge"><span class="sb-icon">💡</span>Concept Dev</div>
+      <div class="skill-badge"><span class="sb-icon">🖤</span>Solo Studio</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-label">// INSPIRED BY</div>
+    <div class="loves-row">
+      <div class="love-tag">🐢 Ninja Turtles</div>
+      <div class="love-tag">🔥 Itachi Uchiha</div>
+      <div class="love-tag">⚔️ Anime</div>
+      <div class="love-tag">💻 Laptops</div>
+      <div class="love-tag">🎮 Deep Games</div>
+      <div class="love-tag">🌙 Dark Aesthetic</div>
+      <div class="love-tag">✨ Creating Things</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-label">// CONTACT</div>
+    <div class="contact-box">
+      <div class="contact-row">
+        <div class="cr-icon">✉</div>
+        <div>
+          <div class="cr-label">EMAIL</div>
+          <div class="cr-value"><a href="mailto:maniflashmani@gmail.com">maniflashmani@gmail.com</a></div>
+        </div>
+      </div>
+      <div class="yt-row">
+        <div class="yt-icon">▶</div>
+        <div>
+          <div class="yt-label">YOUTUBE</div>
+          <div class="yt-value"><a href="https://www.youtube.com/@ShadowCoreStudio-i7r" target="_blank">@ShadowCoreStudio</a></div>
+        </div>
+      </div>
+      <div class="contact-row">
+        <div class="cr-icon">🕹</div>
+        <div>
+          <div class="cr-label">STUDIO</div>
+          <div class="cr-value" style="color:#C77DFF">Shadow Core Studio</div>
+        </div>
+      </div>
+      <div class="contact-row">
+        <div class="cr-icon">👤</div>
+        <div>
+          <div class="cr-label">ALIAS</div>
+          <div class="cr-value">Shadow Game Dev</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2024 SHADOW CORE STUDIO · ALL RIGHTS RESERVED · BUILT IN THE DARK
+  </div>
+
+</div>
+</body>
+</html>
