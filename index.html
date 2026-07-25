@@ -49,6 +49,15 @@
   .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--purple), transparent); margin: 0 24px; position: relative; }
   .divider::before { content: '◆'; position: absolute; left: 50%; transform: translate(-50%,-50%); color: var(--purple-light); font-size: 10px; background: var(--bg-dark); padding: 0 8px; }
 
+  /* NAV / FAKE MULTI-PAGE */
+  .site-nav { position: sticky; top: 0; z-index: 50; display: flex; justify-content: center; gap: 4px; padding: 10px 16px; background: rgba(11,11,14,0.85); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(106,27,154,0.25); }
+  .nav-btn { background: transparent; border: 1px solid rgba(106,27,154,0.35); color: var(--text-muted); font-family: inherit; font-size: 10px; letter-spacing: 2px; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+  .nav-btn:hover { color: #fff; border-color: var(--purple-light); background: rgba(106,27,154,0.12); }
+  .nav-btn.active { color: #fff; background: rgba(106,27,154,0.25); border-color: var(--purple-light); box-shadow: 0 0 12px rgba(199,125,255,0.35); }
+  .page-view { display: none; }
+  .page-view.active { display: block; animation: pageIn 0.5s ease forwards; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
   .section { padding: 28px 24px; opacity: 0; transform: translateY(24px); animation: revealSection 0.8s ease forwards; animation-timeline: view(); animation-range: entry 0% cover 25%; }
   @keyframes revealSection { to { opacity: 1; transform: translateY(0); } }
   @supports not (animation-timeline: view()) { .section { opacity: 1; transform: none; } }
@@ -156,9 +165,17 @@
     </div>
   </div>
 
+  <nav class="site-nav" id="siteNav">
+    <button class="nav-btn" data-page="home">HOME</button>
+    <button class="nav-btn" data-page="game">GAME</button>
+    <button class="nav-btn" data-page="recommended">RECOMMENDED</button>
+    <button class="nav-btn" data-page="contact">CONTACT</button>
+  </nav>
+
   <div class="terminal-line">> initializing developer profile... <span style="color:#C77DFF">OK</span></div>
   <div class="divider"></div>
 
+  <div class="page-view" data-page="home">
   <div class="section">
     <div class="section-label">// ABOUT</div>
     <div class="about-grid">
@@ -189,7 +206,9 @@
   </div>
 
   <div class="divider"></div>
+  </div>
 
+  <div class="page-view" data-page="game">
   <!-- GAME SHOWCASE -->
   <div class="section">
     <div class="section-label">// GAME IN DEVELOPMENT</div>
@@ -218,7 +237,9 @@
   </div>
 
   <div class="divider"></div>
+  </div>
 
+  <div class="page-view" data-page="recommended">
   <!-- RECOMMENDED GAMES -->
   <div class="section">
     <div class="section-label">// GAMES I RECOMMEND</div>
@@ -256,7 +277,9 @@
   </div>
 
   <div class="divider"></div>
+  </div>
 
+  <div class="page-view" data-page="contact">
   <div class="section">
     <div class="section-label">// CONTACT</div>
     <div class="contact-box">
@@ -290,6 +313,7 @@
       </div>
     </div>
   </div>
+  </div>
 
   <div class="footer">
     © 2024 SHADOW CORE STUDIO · ALL RIGHTS RESERVED · BUILT IN THE DARK
@@ -316,7 +340,32 @@
     }
   })();
 
-  // fallback reveal for browsers without animation-timeline support
+  // fake multi-page routing (hash-based, works on plain GitHub Pages)
+  (function(){
+    const pages = document.querySelectorAll('.page-view');
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const validPages = Array.from(pages).map(p => p.dataset.page);
+
+    function showPage(name) {
+      if (!validPages.includes(name)) name = 'home';
+      pages.forEach(p => p.classList.toggle('active', p.dataset.page === name));
+      navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === name));
+      window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    }
+
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        location.hash = btn.dataset.page;
+      });
+    });
+
+    window.addEventListener('hashchange', () => {
+      showPage(location.hash.replace('#', '') || 'home');
+    });
+
+    showPage(location.hash.replace('#', '') || 'home');
+  })();
+
   if (!CSS.supports('animation-timeline: view()')) {
     const sections = document.querySelectorAll('.section');
     const obs = new IntersectionObserver((entries) => {
