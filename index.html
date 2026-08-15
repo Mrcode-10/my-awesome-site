@@ -69,6 +69,29 @@
   .divider::before { content: '◆'; position: absolute; left: 50%; transform: translate(-50%,-50%); color: var(--purple-light); font-size: 10px; background: var(--bg-dark); padding: 0 8px; }
 
   /* NAV */
+  .gh-card { background: linear-gradient(160deg, var(--bg-card) 0%, #0d0a12 100%); border: 1px solid rgba(106,27,154,0.4); border-radius: 12px; padding: 18px; transition: box-shadow 0.3s ease; }
+  .gh-card:hover { box-shadow: 0 12px 32px rgba(106,27,154,0.35); }
+  .gh-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .gh-avatar { width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--purple-light); background: rgba(106,27,154,0.18); border: 1px solid rgba(199,125,255,0.4); }
+  .gh-username { font-size: 14px; color: #fff; letter-spacing: 0.5px; }
+  .gh-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; margin-top: 2px; }
+  .gh-link { margin-inline-start: auto; font-size: 9px; letter-spacing: 2px; color: var(--purple-light); text-decoration: none; border: 1px solid rgba(199,125,255,0.35); padding: 6px 10px; border-radius: 5px; transition: all 0.2s ease; white-space: nowrap; }
+  .gh-link:hover { background: rgba(106,27,154,0.2); box-shadow: 0 0 10px rgba(199,125,255,0.4); }
+  .gh-chart-wrap { background: #08080b; border: 1px solid rgba(106,27,154,0.25); border-radius: 8px; padding: 14px; overflow-x: auto; }
+  .gh-chart { display: block; min-width: 640px; width: 100%; filter: drop-shadow(0 0 8px rgba(199,125,255,0.15)); }
+  .gh-foot { text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 12px; letter-spacing: 1px; }
+  .gh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+  @media (max-width: 520px) { .gh-grid { grid-template-columns: 1fr; } }
+  .gh-stats-block { background: #08080b; border: 1px solid rgba(106,27,154,0.25); border-radius: 8px; padding: 12px; transition: border-color 0.25s ease, box-shadow 0.25s ease; }
+  .gh-stats-block:hover { border-color: rgba(199,125,255,0.5); box-shadow: 0 6px 20px rgba(106,27,154,0.3); }
+  .gh-block-label { font-size: 9px; letter-spacing: 3px; color: var(--purple-light); margin-bottom: 10px; text-align: center; }
+  .gh-stats-img { display: block; width: 100%; height: auto; }
+  .gh-pie { max-width: 260px; margin: 0 auto; }
+  .gh-error-msg { display: none; font-size: 10px; color: var(--text-muted); text-align: center; padding: 20px 8px; line-height: 1.7; }
+  .gh-error-msg a { color: var(--purple-light); }
+  .gh-stats-block.gh-error .gh-stats-img { display: none; }
+  .gh-stats-block.gh-error .gh-error-msg { display: block; }
+
   .site-nav { position: sticky; top: 0; z-index: 50; display: flex; justify-content: center; gap: 4px; padding: 10px 16px; background: rgba(11,11,14,0.82); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(106,27,154,0.25); flex-wrap: wrap; }
   .nav-btn { position: relative; background: transparent; border: 1px solid rgba(106,27,154,0.35); color: var(--text-muted); font-family: inherit; font-size: 10px; letter-spacing: 2px; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: all 0.25s ease; white-space: nowrap; overflow: hidden; }
   .nav-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(199,125,255,0.25), transparent); transform: translateX(-100%); transition: transform 0.5s ease; }
@@ -206,6 +229,7 @@
     <button class="nav-btn" data-page="game">GAME</button>
     <button class="nav-btn" data-page="recommended">RECOMMENDED</button>
     <button class="nav-btn" data-page="play">PLAY</button>
+    <button class="nav-btn" data-page="github">GITHUB</button>
     <button class="nav-btn" data-page="contact">CONTACT</button>
   </nav>
 
@@ -329,6 +353,40 @@
         <button class="game-btn" id="startBtn">START</button>
       </div>
       <div class="game-hint">Move with ← → arrows, A/D, or drag on mobile. Catch the light, dodge the shadows.</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  </div>
+
+  <div class="page-view" data-page="github">
+  <div class="section">
+    <div class="section-label">// GITHUB ACTIVITY</div>
+    <div class="gh-card">
+      <div class="gh-head">
+        <div class="gh-avatar">⌗</div>
+        <div>
+          <div class="gh-username">Mrcode-10</div>
+          <div class="gh-sub">Shadow Core Studio · dev activity</div>
+        </div>
+        <a class="gh-link" href="https://github.com/Mrcode-10" target="_blank" rel="noreferrer">VIEW PROFILE →</a>
+      </div>
+      <div class="gh-chart-wrap">
+        <img class="gh-chart" src="https://ghchart.rshah.org/C77DFF/Mrcode-10" alt="Mrcode-10's GitHub contribution chart" loading="lazy" />
+      </div>
+      <div class="gh-foot">Live contribution graph, pulled straight from GitHub · updates automatically</div>
+
+      <div class="gh-grid">
+        <div class="gh-stats-block">
+          <div class="gh-block-label">STATS</div>
+          <img class="gh-stats-img" src="https://github-stats-extended.vercel.app/api?username=Mrcode-10&show_icons=true&include_all_commits=true&count_private=true&hide_border=true&bg_color=00000000&title_color=C77DFF&text_color=EDEDED&icon_color=C77DFF&ring_color=C77DFF" alt="Mrcode-10's GitHub stats — commits, stars, PRs, issues" loading="lazy" onerror="this.closest('.gh-stats-block').classList.add('gh-error')" />
+          <div class="gh-error-msg">Stats card is taking a moment to load — <a href="https://github.com/Mrcode-10" target="_blank" rel="noreferrer">view on GitHub</a> in the meantime.</div>
+        </div>
+        <div class="gh-stats-block">
+          <div class="gh-block-label">LANGUAGES</div>
+          <img class="gh-stats-img gh-pie" src="https://github-stats-extended.vercel.app/api/top-langs/?username=Mrcode-10&layout=pie&hide_border=true&bg_color=00000000&title_color=C77DFF&text_color=EDEDED" alt="Mrcode-10's most used languages" loading="lazy" onerror="this.closest('.gh-stats-block').classList.add('gh-error')" />
+          <div class="gh-error-msg">Language chart is taking a moment to load — <a href="https://github.com/Mrcode-10?tab=repositories" target="_blank" rel="noreferrer">view repos on GitHub</a> in the meantime.</div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="divider"></div>
