@@ -184,6 +184,10 @@
   .game-controls { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
   .game-btn { background: rgba(106,27,154,0.18); border: 1px solid var(--purple-light); color: #fff; font-family: inherit; font-size: 11px; letter-spacing: 2px; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
   .game-btn:hover { background: rgba(106,27,154,0.35); box-shadow: 0 0 16px rgba(199,125,255,0.5); transform: translateY(-2px); }
+  .game-btn.secondary { background: transparent; border-color: rgba(106,27,154,0.4); color: var(--text-muted); }
+  .game-btn.secondary:hover { color: #fff; border-color: var(--purple-light); background: rgba(106,27,154,0.15); }
+  .game-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+  .game-hint b { color: var(--purple-light); }
   .game-hint { text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 10px; letter-spacing: 1px; }
 
   .footer { text-align: center; padding: 24px; font-size: 10px; color: rgba(136,136,136,0.5); letter-spacing: 3px; border-top: 1px solid rgba(106,27,154,0.15); }
@@ -351,8 +355,10 @@
       <canvas id="gameCanvas" width="640" height="360"></canvas>
       <div class="game-controls">
         <button class="game-btn" id="startBtn">START</button>
+        <button class="game-btn secondary" id="pauseBtn" disabled>PAUSE</button>
+        <button class="game-btn secondary" id="resetBtn">RESET</button>
       </div>
-      <div class="game-hint">Move with ← → arrows, A/D, or drag on mobile. Catch the light, dodge the shadows.</div>
+      <div class="game-hint">Move with ← → arrows, A/D, or drag on mobile. Catch the light, dodge the shadows. Press <b>P</b> to pause.</div>
     </div>
   </div>
   <div class="divider"></div>
@@ -535,11 +541,16 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const hudScore = document.getElementById('hudScore');
     const hudLives = document.getElementById('hudLives');
 
     let W = canvas.width, H = canvas.height;
-    let player, orbs, score, lives, running, spawnTimer, speedMult, keys;
+    let player, orbs, score, lives, spawnTimer, speedMult, keys;
+    let particles = [], trail = [], stars = [];
+    let shakeTime = 0, flashTime = 0;
+    let state = 'idle'; // idle | playing | paused | over
 
     function resizeCanvas(){
       const ratio = 640/360;
@@ -549,14 +560,28 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
+    for (let i = 0; i < 50; i++) {
+      stars.push({ x: Math.random()*W, y: Math.random()*H, r: 0.5 + Math.random()*1.2, phase: Math.random()*Math.PI*2, speed: 0.02 + Math.random()*0.03 });
+    }
+
+    function setState(next){
+      state = next;
+      pauseBtn.disabled = !(state === 'playing' || state === 'paused');
+      pauseBtn.textContent = state === 'paused' ? 'RESUME' : 'PAUSE';
+      startBtn.textContent = state === 'over' ? 'PLAY AGAIN' : 'START';
+    }
+
     function resetGame(){
       player = { x: W/2, y: H-30, r: 12, speed: 6 };
       orbs = [];
+      particles = [];
+      trail = [];
       score = 0;
       lives = 3;
       spawnTimer = 0;
       speedMult = 1;
-      running = true;
+      shakeTime = 0;
+      flashTime = 0;
       keys = {};
       hudScore.textContent = score;
       hudLives.textContent = lives;
@@ -569,14 +594,41 @@
         y: -10,
         r: isLight ? 7 : 11,
         vy: (1.6 + Math.random()*1.6) * speedMult,
-        light: isLight
+        light: isLight,
+        age: 0
       });
+    }
+
+    function burst(x, y, color, count){
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random()*Math.PI*2;
+        const speed = 1 + Math.random()*3;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle)*speed,
+          vy: Math.sin(angle)*speed,
+          life: 1,
+          decay: 0.025 + Math.random()*0.03,
+          r: 1.5 + Math.random()*2,
+          color
+        });
+      }
     }
 
     function drawBackground(){
       ctx.fillStyle = '#08080b';
       ctx.fillRect(0,0,W,H);
-      ctx.strokeStyle = 'rgba(106,27,154,0.12)';
+
+      stars.forEach(s => {
+        s.phase += s.speed;
+        const a = 0.25 + Math.sin(s.phase) * 0.25 + 0.25;
+        ctx.fillStyle = `rgba(199,125,255,${a.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      ctx.strokeStyle = 'rgba(106,27,154,0.10)';
       ctx.lineWidth = 1;
       for (let gx = 0; gx < W; gx += 32) {
         ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke();
@@ -586,14 +638,25 @@
       }
     }
 
+    function drawTrail(){
+      trail.forEach((t, i) => {
+        const a = (i / trail.length) * 0.35;
+        ctx.fillStyle = `rgba(199,125,255,${a.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, player.r * 0.6 * (i/trail.length), 0, Math.PI*2);
+        ctx.fill();
+      });
+    }
+
     function drawPlayer(){
-      const grd = ctx.createRadialGradient(player.x, player.y, 1, player.x, player.y, player.r*2.4);
+      const pulse = 1 + Math.sin(Date.now()/220) * 0.06;
+      const grd = ctx.createRadialGradient(player.x, player.y, 1, player.x, player.y, player.r*2.6*pulse);
       grd.addColorStop(0, '#ffffff');
       grd.addColorStop(0.4, '#C77DFF');
       grd.addColorStop(1, 'rgba(199,125,255,0)');
       ctx.fillStyle = grd;
       ctx.beginPath();
-      ctx.arc(player.x, player.y, player.r*2.4, 0, Math.PI*2);
+      ctx.arc(player.x, player.y, player.r*2.6*pulse, 0, Math.PI*2);
       ctx.fill();
       ctx.fillStyle = '#fff';
       ctx.beginPath();
@@ -603,66 +666,123 @@
 
     function drawOrbs(){
       orbs.forEach(o => {
+        const growth = Math.min(1, o.age / 10);
+        const rad = o.r * 2.2 * growth;
         if (o.light) {
-          const grd = ctx.createRadialGradient(o.x, o.y, 1, o.x, o.y, o.r*2.2);
+          const grd = ctx.createRadialGradient(o.x, o.y, 1, o.x, o.y, rad);
           grd.addColorStop(0, '#fff8e0');
           grd.addColorStop(0.5, '#FFB020');
           grd.addColorStop(1, 'rgba(255,176,32,0)');
           ctx.fillStyle = grd;
         } else {
-          const grd = ctx.createRadialGradient(o.x, o.y, 1, o.x, o.y, o.r*2.2);
+          const grd = ctx.createRadialGradient(o.x, o.y, 1, o.x, o.y, rad);
           grd.addColorStop(0, '#6A1B9A');
           grd.addColorStop(0.5, '#2b0a3d');
           grd.addColorStop(1, 'rgba(43,10,61,0)');
           ctx.fillStyle = grd;
         }
         ctx.beginPath();
-        ctx.arc(o.x, o.y, o.r*2.2, 0, Math.PI*2);
+        ctx.arc(o.x, o.y, rad, 0, Math.PI*2);
         ctx.fill();
       });
+    }
+
+    function drawParticles(){
+      particles.forEach(p => {
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
     }
 
     function dist(a,b,c,d){ return Math.hypot(a-c, b-d); }
 
     function update(){
-      if (!running) return;
+      if (state !== 'playing') return;
       if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
       if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
       player.x = Math.max(player.r, Math.min(W-player.r, player.x));
+
+      trail.push({ x: player.x, y: player.y });
+      if (trail.length > 10) trail.shift();
 
       spawnTimer++;
       const spawnRate = Math.max(18, 42 - Math.floor(score/6));
       if (spawnTimer > spawnRate) { spawnOrb(); spawnTimer = 0; }
       speedMult = 1 + score/80;
 
-      orbs.forEach(o => o.y += o.vy);
+      orbs.forEach(o => { o.y += o.vy; o.age++; });
 
       for (let i = orbs.length-1; i >= 0; i--) {
         const o = orbs[i];
         if (dist(player.x, player.y, o.x, o.y) < player.r + o.r) {
-          if (o.light) { score += 1; hudScore.textContent = score; }
-          else { lives -= 1; hudLives.textContent = lives; if (lives <= 0) { gameOver(); } }
+          if (o.light) {
+            score += 1;
+            hudScore.textContent = score;
+            burst(o.x, o.y, '#FFB020', 10);
+          } else {
+            lives -= 1;
+            hudLives.textContent = lives;
+            burst(o.x, o.y, '#C77DFF', 14);
+            shakeTime = 12;
+            flashTime = 10;
+            if (lives <= 0) { gameOver(); }
+          }
           orbs.splice(i,1);
           continue;
         }
         if (o.y > H+20) orbs.splice(i,1);
       }
+
+      for (let i = particles.length-1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.03; p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i,1);
+      }
+
+      if (shakeTime > 0) shakeTime--;
+      if (flashTime > 0) flashTime--;
     }
 
     function draw(){
+      ctx.save();
+      if (shakeTime > 0) {
+        const dx = (Math.random()-0.5) * shakeTime * 0.8;
+        const dy = (Math.random()-0.5) * shakeTime * 0.8;
+        ctx.translate(dx, dy);
+      }
+
       drawBackground();
+      drawTrail();
       drawOrbs();
+      drawParticles();
       drawPlayer();
-      if (!running) {
+
+      if (flashTime > 0) {
+        ctx.fillStyle = `rgba(255,60,60,${(flashTime/10*0.25).toFixed(2)})`;
+        ctx.fillRect(0,0,W,H);
+      }
+      ctx.restore();
+
+      if (state !== 'playing') {
         ctx.fillStyle = 'rgba(0,0,0,0.55)';
         ctx.fillRect(0,0,W,H);
         ctx.fillStyle = '#C77DFF';
         ctx.font = 'bold 22px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText(score === 0 && lives === 3 ? 'PRESS START' : 'GAME OVER', W/2, H/2 - 10);
+        let title = 'PRESS START';
+        if (state === 'paused') title = 'PAUSED';
+        if (state === 'over') title = 'GAME OVER';
+        ctx.fillText(title, W/2, H/2 - 10);
         ctx.fillStyle = '#EDEDED';
         ctx.font = '13px monospace';
-        ctx.fillText(score > 0 || lives < 3 ? `Score: ${score}` : 'Catch the light. Dodge the shadow.', W/2, H/2 + 18);
+        let sub = 'Catch the light. Dodge the shadow.';
+        if (state === 'paused') sub = `Score: ${score} · press RESUME to continue`;
+        if (state === 'over') sub = `Final score: ${score}`;
+        ctx.fillText(sub, W/2, H/2 + 18);
       }
     }
 
@@ -673,10 +793,13 @@
     }
 
     function gameOver(){
-      running = false;
+      setState('over');
     }
 
-    window.addEventListener('keydown', e => { keys[e.key] = true; });
+    window.addEventListener('keydown', e => {
+      keys[e.key] = true;
+      if (e.key === 'p' || e.key === 'P') togglePause();
+    });
     window.addEventListener('keyup', e => { keys[e.key] = false; });
 
     let dragging = false;
@@ -691,12 +814,23 @@
       player.x = Math.max(player.r, Math.min(W-player.r, player.x));
     }
 
+    function togglePause(){
+      if (state === 'playing') setState('paused');
+      else if (state === 'paused') setState('playing');
+    }
+
     startBtn.addEventListener('click', () => {
       resetGame();
+      setState('playing');
+    });
+    pauseBtn.addEventListener('click', togglePause);
+    resetBtn.addEventListener('click', () => {
+      resetGame();
+      setState('idle');
     });
 
     resetGame();
-    running = false;
+    setState('idle');
     loop();
   })();
 </script>
