@@ -136,7 +136,7 @@
   .game-banner-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 100%, rgba(106,27,154,0.4), transparent 70%); }
   .game-banner-rays { position: absolute; inset: -20%; background: conic-gradient(from 0deg, transparent 0deg, rgba(199,125,255,0.09) 8deg, transparent 16deg); animation: rayRotate2 12s linear infinite; }
   @keyframes rayRotate2 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  .game-banner-title { position: relative; z-index: 2; font-family: 'Cinzel', serif; font-size: 23px; font-weight: 700; letter-spacing: 3px; color: #fff; text-shadow: 0 0 20px rgba(199,125,255,0.8); }
+  .game-banner-title { position: relative; z-index: 2; font-family: 'Cinzel', serif; font-size: 23px; font-weight: 700; letter-spacing: 3px; color: #fff; text-shadow: 0 0 20px rgba(199,125,255,0.8); text-align: center; padding: 0 12px; }
   .game-banner-glow-line { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--purple-light), transparent); animation: lineSweep 3s ease-in-out infinite; }
   @keyframes lineSweep { 0%,100%{ opacity: 0.3; } 50%{ opacity: 1; } }
   .game-body { padding: 16px; }
@@ -145,11 +145,6 @@
   @keyframes statusPulse { 0%,100%{ opacity: 1; } 50%{ opacity: 0.35; } }
   .status-text { font-size: 10px; letter-spacing: 2px; color: var(--gold); }
   .game-desc { font-size: 12.5px; line-height: 1.9; color: #bbb; margin-bottom: 14px; }
-  .progress-wrap { margin-top: 6px; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 6px; }
-  .progress-track { height: 6px; border-radius: 4px; background: rgba(106,27,154,0.15); overflow: hidden; }
-  .progress-fill { height: 100%; width: 0%; border-radius: 4px; background: linear-gradient(90deg, var(--purple), var(--purple-light)); box-shadow: 0 0 10px rgba(199,125,255,0.6); animation: growFill 1.6s ease forwards 0.3s; }
-  @keyframes growFill { to { width: 35%; } }
 
   /* RECOMMENDED GAMES */
   .rec-games { display: flex; flex-direction: column; gap: 12px; }
@@ -252,7 +247,7 @@
     <div class="about-bio">
       A 20-year-old creator building worlds from the dark. Passionate about games that leave you speechless — games where you finish and just say: <span style="color:#C77DFF">"Wow."</span>
       High-end graphics, deep concepts, and unforgettable experiences — that's what Shadow Core Studio is all about.
-      Currently a student and solo developer, crafting worlds with Unreal Engine.
+      Currently a student and solo developer, crafting worlds with Godot, Unreal Engine, and Unity.
     </div>
   </div>
 
@@ -261,7 +256,10 @@
   <div class="section">
     <div class="section-label">// TECH STACK</div>
     <div class="skills-grid">
+      <div class="skill-badge"><span class="sb-icon">🤖</span>Godot Engine</div>
       <div class="skill-badge"><span class="sb-icon">⚡</span>Unreal Engine</div>
+      <div class="skill-badge"><span class="sb-icon">🧊</span>Unity</div>
+      <div class="skill-badge"><span class="sb-icon">💻</span>GDScript &amp; C++</div>
       <div class="skill-badge"><span class="sb-icon">🎮</span>Game Design</div>
       <div class="skill-badge"><span class="sb-icon">🌑</span>Dark Worlds</div>
       <div class="skill-badge"><span class="sb-icon">🎨</span>High-End Graphics</div>
@@ -274,14 +272,14 @@
   </div>
 
   <div class="page-view" data-page="game">
-  <!-- GAME SHOWCASE -->
+  <!-- GAMES IN DEVELOPMENT -->
   <div class="section">
-    <div class="section-label">// GAME IN DEVELOPMENT</div>
+    <div class="section-label">// GAMES IN DEVELOPMENT</div>
     <div class="game-card">
       <div class="game-banner">
         <div class="game-banner-bg"></div>
         <div class="game-banner-rays"></div>
-        <div class="game-banner-title">LIGHT IN DARKNESS</div>
+        <div class="game-banner-title">2 GAMES IN DEVELOPMENT</div>
         <div class="game-banner-glow-line"></div>
       </div>
       <div class="game-body">
@@ -290,12 +288,8 @@
           <span class="status-text">IN DEVELOPMENT</span>
         </div>
         <div class="game-desc">
-          Shadow Core Studio's first title. An atmospheric experience where the story revolves around light and darkness — exactly what this studio stands for.
-          More details and the trailer will drop soon, right here and on the YouTube channel.
-        </div>
-        <div class="progress-wrap">
-          <div class="progress-label"><span>PRE-PRODUCTION</span><span>EARLY STAGE</span></div>
-          <div class="progress-track"><div class="progress-fill"></div></div>
+          Two games are currently in development at Shadow Core Studio.
+          Details, names, and trailers will drop soon, right here and on the YouTube channel.
         </div>
       </div>
     </div>
@@ -321,6 +315,41 @@
         <div class="rec-info">
           <div class="rec-name">Resident Evil <span class="rec-tag">SURVIVAL HORROR</span></div>
           <div class="rec-why">Atmosphere, tension, and level design that still inspires horror games today.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">🔫</div>
+        <div class="rec-info">
+          <div class="rec-name">Resident Evil 4 Remake <span class="rec-tag">SURVIVAL HORROR</span></div>
+          <div class="rec-why">A remake that respects the original and still feels fresh — pure tension and polish.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">🧙</div>
+        <div class="rec-info">
+          <div class="rec-name">Hogwarts Legacy <span class="rec-tag">OPEN WORLD</span></div>
+          <div class="rec-why">A world you actually want to live in — magic, exploration, and atmosphere done right.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">🦇</div>
+        <div class="rec-info">
+          <div class="rec-name">Batman: Arkham Knight <span class="rec-tag">ACTION</span></div>
+          <div class="rec-why">Dark Gotham, smooth combat, and a masterclass in atmosphere.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">🗡️</div>
+        <div class="rec-info">
+          <div class="rec-name">Hollow Knight <span class="rec-tag">METROIDVANIA</span></div>
+          <div class="rec-why">Haunting art, tight gameplay, and a world full of secrets — proof that 2D can be unforgettable.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">👦</div>
+        <div class="rec-info">
+          <div class="rec-name">Inside <span class="rec-tag">PUZZLE-PLATFORMER</span></div>
+          <div class="rec-why">Storytelling without a single word. Dark, tense, and perfectly paced.</div>
         </div>
       </div>
     </div>
